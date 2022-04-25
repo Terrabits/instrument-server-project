@@ -1,0 +1,10 @@
+@echo off
+SET "ROOT_DIR=%~dp0.."
+
+
+setlocal
+cd "%ROOT_DIR%"
+
+
+REM clean
+del *.csv 2> nul
