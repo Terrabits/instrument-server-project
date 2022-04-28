@@ -6,24 +6,15 @@ ADDRESS   = 'localhost'
 PORT      = 9000
 
 
-# connect
+# connect to server
 client = Client(ADDRESS, PORT)
 
-# confirm initial data
-response     = client.query('data?')
-initial_data = float(response)
-assert initial_data == 1.0
+# send command1
+response = client.query('command1 3.14159')
+print('received:')
+print(f"'{response}'")
+assert 'response' in response
 
-# set final data
-client.write('data 2.0')
-
-# confirm final data
-response   = client.query('data?')
-final_data = float(response)
-assert final_data == 2.0
-
-# close server
+# close
 client.write('quit')
-
-# close client
 client.close()
