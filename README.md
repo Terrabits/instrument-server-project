@@ -5,7 +5,7 @@ This project is an [Instrument Server](https://github.com/Terrabits/instrument-s
 ## Requirements
 
 -   Python 3.7+
--   instrument-server ~= 2.1.0
+-   instrument-server ~= 2.1.1
 
 ## Install
 
@@ -21,97 +21,32 @@ Run `scripts/start &` (bash) or `scripts\start-in-background.bat` (windows) to s
 
 Then run `scripts/client` to connect to the server and send a few test commands.
 
-## Devices and Connection Settings
+## Commands
 
-The device life cycle is handled by Instrument Server.
+To implement a new command, copy [commands/command1.py](commands/command1.py) to a new file (e.g. `command2.py`), then:
 
-[devices.yaml](devices.yaml) contains the device connection settings:
+-   change the `command` property
+-   change the `args` property
+-   change the `code` method
+-   edit [**main**.py](__main__.py) to include the new plugin module in the plugins list (see below).
 
-```yaml
-device1:
-  type:         my_device
-  initial_data: 'initial data'
-```
+## Devices
 
-`type` must reference an available Device Factory type. In this case, the `my_device` type matches `MyDeviceFactory.type`. See the `MyDeviceFactory` section below.
+To implement a new device type, copy [devices/device1_factory.py](devices/device1_factory.py) to a new file (e.g. `device2_factory.py`), then:
 
-## Plugins List
+-   change the `type` property
+-   change the `open` method
+-   change the `close` method
+-   edit [**main**.py](__main__.py) to include the new plugin module in the plugins list (see below).
 
-Instrument Server requires a list of plugins for import. [plugins.yaml](plugins.yaml) contains the plugin list for this project:
+## Main
 
-```yaml
-- devices.my_device_factory
-- commands.get_data
-- commands.set_data
-```
+[**main**.py](__main__.py) contains the application starting point.
 
-### `MyDeviceFactory`
+Remember to:
 
-Instrument Server requires a `DeviceFactory` plugin for each supported device type.
-
-A hypothetical device type, `MyDevice`, is included as a placeholder. The `MyDevice` class definition can be found here:
-
-[devices/my_device.py](devices/my_device.py)
-
-Then, the `MyDeviceFactory` plugins makes device type `my_device` available in Instrument Server and `devices.yaml`.
-
-In [devices.my_device_factory.py](devices.my_device_factory.py):
-
-```python
-class MyDeviceFactory(DeviceFactoryBase):
-    type = 'my_device'
-
-    def open(self, *, initial_data=b''):
-        return MyDevice(initial_data)
-
-    def close(self, device):
-        device.close()
-```
-
-The keyword arguments for the `MyDeviceFactory.open` method determine the required and default connection settings for the `my_device` type.
-
-The `my_device` type settings are:
-
-```comment
-my_device settings:
-  initial_data (optional): initial value of MyDevice.data.
-                           Default is an empty string `''`.
-```
-
-### `GetDataCommand`
-
-This command returns `device1.data` (float).
-
-Syntax: `data?`
-
-In [commands/get_data.py](commands/get_data.py):
-
-```python
-class GetDataCommand(BasicCommand):
-    command = 'data?'
-    args    = {}
-
-    def code(self, devices, args):
-        data = devices['device1'].data
-        return str(data).encode()  # bytes
-```
-
-### `SetDataCommand`
-
-This command sets `device1.data` to a new `float` value.
-
-Syntax: `data <float>`
-
-In [commands/set_data.py](commands/set_data.py):
-
-```python
-class SetDataCommand(BasicCommand):
-    command = 'data'
-    args    = {'data': float}
-
-    def code(self, devices, args):
-        devices['device1'].data = args['data']
-```
+-   edit the `PLUGINS` module list to include all `commands/` and `devices/` plugins.
+-   edit the `DEVICES` settings to match `devices/` types and the current instrument setup.
 
 ## References
 

@@ -10,4 +10,4 @@ cd "$ROOT_DIR"
 
 
 # start
-instrument-server "$@" plugins.yaml devices.yaml
+python . "$@"

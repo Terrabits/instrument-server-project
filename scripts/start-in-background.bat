@@ -7,4 +7,4 @@ cd %ROOT_DIR%
 
 
 REM start as separate process
-start instrument-server %* plugins.yaml devices.yaml
+start python . %*
